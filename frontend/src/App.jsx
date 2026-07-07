@@ -4,6 +4,8 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
+import Upload from './pages/Upload'
+import DocumentViewer from './pages/DocumentViewer'
 import AdminDashboard from './pages/AdminDashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -20,6 +22,7 @@ export default function App() {
               <>
                 <span>{user.full_name}</span>
                 <Link to="/dashboard" className="hover:underline">Dashboard</Link>
+                <Link to="/upload" className="hover:underline">Upload</Link>
                 {user.role === 'admin' && <Link to="/admin" className="hover:underline">Admin</Link>}
                 <button onClick={logout} className="bg-white text-indigo-700 px-3 py-1 rounded hover:bg-gray-100 transition">
                   Logout
@@ -44,6 +47,12 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={
             <ProtectedRoute><Dashboard /></ProtectedRoute>
+          } />
+          <Route path="/upload" element={
+            <ProtectedRoute><Upload /></ProtectedRoute>
+          } />
+          <Route path="/view/:id" element={
+            <ProtectedRoute><DocumentViewer /></ProtectedRoute>
           } />
           <Route path="/admin" element={
             <ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>
