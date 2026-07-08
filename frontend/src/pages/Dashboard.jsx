@@ -1,6 +1,21 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import {
+  FileText,
+  HardDrive,
+  ShieldCheck,
+  MessageSquareText,
+  Upload,
+  Sparkles,
+  Clock,
+  ChevronRight,
+} from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import api from '../api/client'
+import StatCard from '../components/StatCard'
+import { PageSkeleton } from '../components/LoadingSpinner'
+import EmptyState from '../components/EmptyState'
 
 function formatSize(bytes) {
   if (bytes < 1024) return bytes + ' B'
@@ -8,12 +23,53 @@ function formatSize(bytes) {
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
 }
 
+function formatDate(dateStr) {
+  const d = new Date(dateStr)
+  const now = new Date()
+  const diff = now - d
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  if (days === 0) {
+    const hours = Math.floor(diff / (1000 * 60 * 60))
+    if (hours === 0) return 'Today'
+    return `${hours}h ago`
+  }
+  if (days === 1) return 'Yesterday'
+  if (days < 7) return `${days}d ago`
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+function getMimeLabel(mime) {
+  if (!mime) return 'UNKNOWN'
+  const map = {
+    'application/pdf': 'PDF',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
+    'application/msword': 'DOC',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'XLSX',
+    'application/vnd.ms-excel': 'XLS',
+  }
+  if (mime.startsWith('image/')) return 'IMAGE'
+  return map[mime] || mime.split('/').pop().toUpperCase()
+}
+
+const mimeBadge = {
+  PDF: 'badge-error',
+  DOCX: 'badge-info',
+  DOC: 'badge-info',
+  XLSX: 'badge-success',
+  XLS: 'badge-success',
+  IMAGE: 'badge-warning',
+}
+
 export default function Dashboard() {
   const { user } = useAuth()
   const [docs, setDocs] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api.get('/documents').then(({ data }) => setDocs(data)).catch(() => {})
+    api.get('/documents')
+      .then(({ data }) => setDocs(data))
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }, [])
 
   const totalSize = docs.reduce((sum, d) => sum + d.file_size, 0)
@@ -22,97 +78,190 @@ export default function Dashboard() {
   const storagePct = Math.min((totalSize / (storageLimitMB * 1024 * 1024)) * 100, 100)
 
   const stats = [
-    { label: 'Total Documents', value: docs.length.toString(), color: 'bg-blue-500' },
-    { label: 'Storage Used', value: `${totalMB} MB`, color: 'bg-emerald-500' },
-    { label: 'Compliance Score', value: '94%', color: 'bg-violet-500' },
-    { label: 'AI Queries', value: '18,492', color: 'bg-amber-500' },
+    { label: 'Total Documents', value: docs.length.toString(), icon: FileText, color: 'blue' },
+    { label: 'Storage Used', value: totalMB, icon: HardDrive, color: 'emerald', suffix: 'MB' },
+    { label: 'Compliance Score', value: '94%', icon: ShieldCheck, color: 'violet' },
+    { label: 'AI Queries', value: '18,492', icon: MessageSquareText, color: 'amber' },
   ]
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome back, {user.full_name}</h1>
-          <p className="text-gray-500 mt-1">Here's what's happening with your platform today.</p>
-        </div>
-      </div>
+  const recentDocs = docs.slice(0, 5)
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        {stats.map((stat) => (
-          <div key={stat.label} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-            <div className="flex items-center gap-4">
-              <div className={`w-11 h-11 rounded-lg ${stat.color} flex items-center justify-center text-white text-lg font-bold`}>
-                {stat.label[0]}
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">{stat.label}</p>
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-              </div>
-            </div>
-          </div>
+  if (loading) return <PageSkeleton />
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between"
+      >
+        <div>
+          <h1 className="text-2xl font-bold text-surface-900">
+            Welcome back, <span className="text-brand-600">{user.full_name}</span>
+          </h1>
+          <p className="text-sm text-surface-400 mt-1">Here&apos;s what&apos;s happening today.</p>
+        </div>
+        <Link to="/upload" className="btn-primary hidden sm:flex">
+          <Upload className="w-4 h-4" />
+          Upload Document
+        </Link>
+      </motion.div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {stats.map((stat, i) => (
+          <StatCard key={stat.label} {...stat} index={i} />
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Uploads</h2>
+      {/* Storage bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="card p-5"
+      >
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 text-sm text-surface-600">
+            <HardDrive className="w-4 h-4 text-surface-400" />
+            <span className="font-medium">Storage Usage</span>
+          </div>
+          <span className="text-sm font-medium text-surface-500">{totalMB} MB / {storageLimitMB} MB</span>
+        </div>
+        <div className="w-full h-2.5 bg-surface-100 rounded-full overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${storagePct}%` }}
+            transition={{ duration: 1, delay: 0.5, ease: 'easeOut' }}
+            className={`h-full rounded-full transition-colors duration-500 ${
+              storagePct > 90 ? 'bg-red-500' : storagePct > 70 ? 'bg-amber-500' : 'bg-brand-500'
+            }`}
+          />
+        </div>
+      </motion.div>
+
+      {/* Recent uploads + Quick overview */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent uploads */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="lg:col-span-2 card p-5"
+        >
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-surface-400" />
+              <h2 className="text-base font-semibold text-surface-900">Recent Uploads</h2>
+            </div>
+            {docs.length > 0 && (
+              <span className="text-xs text-surface-400">{docs.length} total</span>
+            )}
+          </div>
+
           {docs.length === 0 ? (
-            <p className="text-sm text-gray-400">No documents uploaded yet.</p>
+            <EmptyState
+              icon={FileText}
+              title="No documents yet"
+              description="Upload your first document to get started with AI-powered analysis."
+              action={
+                <Link to="/upload" className="btn-primary text-sm">
+                  <Upload className="w-4 h-4" />
+                  Upload Document
+                </Link>
+              }
+            />
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-gray-400 border-b border-gray-100">
-                    <th className="pb-3 font-medium">Name</th>
-                    <th className="pb-3 font-medium">Date</th>
-                    <th className="pb-3 font-medium">Size</th>
-                    <th className="pb-3 font-medium">Type</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {docs.map((file) => (
-                    <tr key={file.id} className="border-b border-gray-50 last:border-0">
-                      <td className="py-3 text-gray-900 font-medium">{file.original_filename}</td>
-                      <td className="py-3 text-gray-500">{new Date(file.uploaded_at).toLocaleDateString()}</td>
-                      <td className="py-3 text-gray-500">{formatSize(file.file_size)}</td>
-                      <td className="py-3">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
-                          {file.mime_type.split('/').pop().toUpperCase()}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="space-y-2">
+              {recentDocs.map((doc, i) => {
+                const label = getMimeLabel(doc.mime_type)
+                return (
+                  <motion.div
+                    key={doc.id}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-50 transition-colors group"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-surface-100 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-50 transition-colors">
+                      <FileText className="w-4 h-4 text-surface-400 group-hover:text-brand-500 transition-colors" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-surface-900 truncate">{doc.original_filename}</p>
+                      <p className="text-xs text-surface-400">{formatSize(doc.file_size)} &middot; {formatDate(doc.uploaded_at)}</p>
+                    </div>
+                    <span className={`${mimeBadge[label] || 'badge-info'} flex-shrink-0`}>{label}</span>
+                    <Link
+                      to={`/view/${doc.id}`}
+                      className="btn-ghost text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      View
+                      <ChevronRight className="w-3 h-3" />
+                    </Link>
+                  </motion.div>
+                )
+              })}
             </div>
           )}
-        </div>
+        </motion.div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Overview</h2>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Storage Used</span>
-              <span className="text-sm font-medium text-gray-900">{totalMB} / {storageLimitMB} GB</span>
-            </div>
-            <div className="w-full bg-gray-100 rounded-full h-2">
-              <div className="bg-indigo-600 h-2 rounded-full" style={{ width: `${storagePct}%` }} />
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Documents</span>
-              <span className="text-sm font-medium text-gray-900">{docs.length}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Team Members</span>
-              <span className="text-sm font-medium text-gray-900">12</span>
-            </div>
-            <div className="pt-2 border-t border-gray-100">
-              <p className="text-sm text-gray-500">Account</p>
-              <p className="text-sm font-medium text-gray-900 capitalize">{user.role}</p>
-              <p className="text-xs text-gray-400">{user.email}</p>
-            </div>
+        {/* Quick overview */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="card p-5"
+        >
+          <div className="flex items-center gap-2 mb-5">
+            <Sparkles className="w-4 h-4 text-brand-500" />
+            <h2 className="text-base font-semibold text-surface-900">Quick Overview</h2>
           </div>
-        </div>
+
+          <div className="space-y-4">
+            <div>
+              <div className="flex items-center justify-between text-sm mb-1.5">
+                <span className="text-surface-400">Storage</span>
+                <span className="font-medium text-surface-700">{totalMB} / {storageLimitMB} MB</span>
+              </div>
+              <div className="w-full h-2 bg-surface-100 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    storagePct > 90 ? 'bg-red-500' : storagePct > 70 ? 'bg-amber-500' : 'bg-brand-500'
+                  }`}
+                  style={{ width: `${storagePct}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="divide-y divide-surface-100">
+              {[
+                { label: 'Documents', value: docs.length },
+                { label: 'Team Members', value: '12' },
+                { label: 'Storage Limit', value: `${storageLimitMB} MB` },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center justify-between py-2.5 text-sm">
+                  <span className="text-surface-400">{item.label}</span>
+                  <span className="font-medium text-surface-700">{item.value}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-2 border-t border-surface-100">
+              <p className="text-xs text-surface-400 mb-1">Account</p>
+              <p className="text-sm font-medium text-surface-900 capitalize">{user.role}</p>
+              <p className="text-xs text-surface-400 truncate">{user.email}</p>
+            </div>
+
+            <Link
+              to="/chat"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-brand-500 to-violet-500 text-white text-sm font-medium hover:from-brand-600 hover:to-violet-600 transition-all duration-200 shadow-lg shadow-brand-500/20"
+            >
+              <MessageSquareText className="w-4 h-4" />
+              Ask AI Assistant
+            </Link>
+          </div>
+        </motion.div>
       </div>
     </div>
   )

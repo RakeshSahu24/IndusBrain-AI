@@ -1,4 +1,4 @@
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import Home from './pages/Home'
 import Login from './pages/Login'
@@ -8,66 +8,91 @@ import Upload from './pages/Upload'
 import Chat from './pages/Chat'
 import DocumentViewer from './pages/DocumentViewer'
 import AdminDashboard from './pages/AdminDashboard'
+import About from './pages/About'
 import ProtectedRoute from './components/ProtectedRoute'
+import Layout from './components/Layout'
+
+function ProtectedLayout({ children }) {
+  return (
+    <ProtectedRoute>
+      <Layout>{children}</Layout>
+    </ProtectedRoute>
+  )
+}
+
+function AdminLayout({ children }) {
+  return (
+    <ProtectedRoute adminOnly>
+      <Layout>{children}</Layout>
+    </ProtectedRoute>
+  )
+}
 
 export default function App() {
-  const { user, loading, logout } = useAuth()
+  const { user } = useAuth()
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-indigo-700 text-white py-4 px-6 shadow">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link to="/" className="text-xl font-bold">IndusBrain AI</Link>
-          <nav className="flex items-center gap-4 text-sm">
-            {loading ? null : user ? (
-              <>
-                <span>{user.full_name}</span>
-                <Link to="/dashboard" className="hover:underline">Dashboard</Link>
-                <Link to="/chat" className="hover:underline">Chat</Link>
-                <Link to="/upload" className="hover:underline">Upload</Link>
-                {user.role === 'admin' && <Link to="/admin" className="hover:underline">Admin</Link>}
-                <button onClick={logout} className="bg-white text-indigo-700 px-3 py-1 rounded hover:bg-gray-100 transition">
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="hover:underline">Sign In</Link>
-                <Link to="/register" className="bg-white text-indigo-700 px-3 py-1 rounded hover:bg-gray-100 transition">
-                  Register
-                </Link>
-              </>
-            )}
-          </nav>
-        </div>
-      </header>
+    <Routes>
+      {/* Public routes - no layout */}
+      <Route path="/" element={<Home />} />
+      <Route
+        path="/login"
+        element={user ? <Navigate to="/dashboard" replace /> : <Login />}
+      />
+      <Route
+        path="/register"
+        element={user ? <Navigate to="/dashboard" replace /> : <Register />}
+      />
 
-      <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={
-            <ProtectedRoute><Dashboard /></ProtectedRoute>
-          } />
-          <Route path="/chat" element={
-            <ProtectedRoute><Chat /></ProtectedRoute>
-          } />
-          <Route path="/upload" element={
-            <ProtectedRoute><Upload /></ProtectedRoute>
-          } />
-          <Route path="/view/:id" element={
-            <ProtectedRoute><DocumentViewer /></ProtectedRoute>
-          } />
-          <Route path="/admin" element={
-            <ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>
-          } />
-        </Routes>
-      </main>
-
-      <footer className="bg-gray-200 text-center py-4 text-sm text-gray-600">
-        &copy; {new Date().getFullYear()} IndusBrain AI. All rights reserved.
-      </footer>
-    </div>
+      {/* Protected routes with sidebar layout */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedLayout>
+            <Dashboard />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/upload"
+        element={
+          <ProtectedLayout>
+            <Upload />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/chat"
+        element={
+          <ProtectedLayout>
+            <Chat />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/view/:id"
+        element={
+          <ProtectedLayout>
+            <DocumentViewer />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <AdminLayout>
+            <AdminDashboard />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/about"
+        element={
+          <ProtectedLayout>
+            <About />
+          </ProtectedLayout>
+        }
+      />
+    </Routes>
   )
 }

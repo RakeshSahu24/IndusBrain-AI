@@ -1,6 +1,21 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import {
+  ArrowLeft,
+  Download,
+  FileText,
+  FileImage,
+  FileSpreadsheet,
+  File,
+  Calendar,
+  HardDrive,
+  Tag,
+  AlertTriangle,
+  Loader2,
+} from 'lucide-react'
 import api from '../api/client'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 function formatSize(bytes) {
   if (bytes < 1024) return bytes + ' B'
@@ -8,29 +23,12 @@ function formatSize(bytes) {
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
 }
 
-function isImage(mime) {
-  return mime && mime.startsWith('image/')
-}
-
-function isPdf(mime) {
-  return mime === 'application/pdf'
-}
-
-function isDocx(mime) {
-  return mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-}
-
-function isXlsx(mime) {
-  return mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-}
-
-function isXls(mime) {
-  return mime === 'application/vnd.ms-excel'
-}
-
-function isDoc(mime) {
-  return mime === 'application/msword'
-}
+function isImage(mime) { return mime && mime.startsWith('image/') }
+function isPdf(mime) { return mime === 'application/pdf' }
+function isDocx(mime) { return mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }
+function isXlsx(mime) { return mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+function isXls(mime) { return mime === 'application/vnd.ms-excel' }
+function isDoc(mime) { return mime === 'application/msword' }
 
 export default function DocumentViewer() {
   const { id } = useParams()
@@ -61,16 +59,13 @@ export default function DocumentViewer() {
   }, [doc])
 
   useEffect(() => {
-    return () => {
-      if (objectUrl) URL.revokeObjectURL(objectUrl)
-    }
+    return () => { if (objectUrl) URL.revokeObjectURL(objectUrl) }
   }, [objectUrl])
 
   async function fetchAndCreateObjectUrl() {
     try {
       const res = await api.get(`/documents/${id}/view`, { responseType: 'blob' })
-      const url = URL.createObjectURL(res.data)
-      setObjectUrl(url)
+      setObjectUrl(URL.createObjectURL(res.data))
     } catch {
       setPreviewError('Failed to load file preview.')
     }
@@ -105,7 +100,7 @@ export default function DocumentViewer() {
           ignoreHeight: false,
         })
       } catch {
-        setPreviewError('Failed to render DOCX preview. Download the file instead.')
+        setPreviewError('Failed to render DOCX preview.')
       }
       setPreviewLoading(false)
     }
@@ -123,21 +118,25 @@ export default function DocumentViewer() {
           setXlsxRows(rows.slice(1))
         }
       } catch {
-        setPreviewError('Failed to render spreadsheet preview. Download the file instead.')
+        setPreviewError('Failed to render spreadsheet preview.')
       }
       setPreviewLoading(false)
     }
   }
 
-  if (loading) {
-    return <div className="text-center py-12 text-gray-500">Loading...</div>
-  }
-
+  if (loading) return <LoadingSpinner text="Loading document..." />
   if (error) {
     return (
-      <div className="text-center py-12">
-        <p className="text-red-600 mb-4">{error}</p>
-        <Link to="/upload" className="text-indigo-600 hover:underline">Back to Documents</Link>
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-red-100 flex items-center justify-center mb-4">
+          <AlertTriangle className="w-8 h-8 text-red-500" />
+        </div>
+        <p className="text-lg font-semibold text-surface-900 mb-1">Document not found</p>
+        <p className="text-sm text-surface-400 mb-6">{error}</p>
+        <Link to="/upload" className="btn-primary">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Documents
+        </Link>
       </div>
     )
   }
@@ -146,24 +145,50 @@ export default function DocumentViewer() {
   const showInline = isPdf(mime) || isImage(mime)
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
         <div>
-          <Link to="/upload" className="text-sm text-indigo-600 hover:underline">&larr; Back to Documents</Link>
-          <h1 className="text-xl font-bold text-gray-900 mt-1">{doc.original_filename}</h1>
-          <p className="text-sm text-gray-500">
-            {formatSize(doc.file_size)} &middot; {doc.mime_type}
-          </p>
+          <Link
+            to="/upload"
+            className="inline-flex items-center gap-1.5 text-sm text-surface-400 hover:text-surface-600 transition-colors mb-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Documents
+          </Link>
+          <h1 className="text-xl font-bold text-surface-900">{doc.original_filename}</h1>
+          <div className="flex items-center gap-3 mt-1 text-sm text-surface-400">
+            <span className="flex items-center gap-1">
+              <HardDrive className="w-3.5 h-3.5" />
+              {formatSize(doc.file_size)}
+            </span>
+            <span className="flex items-center gap-1">
+              <Tag className="w-3.5 h-3.5" />
+              {doc.mime_type}
+            </span>
+            <span className="flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5" />
+              {new Date(doc.uploaded_at).toLocaleDateString()}
+            </span>
+          </div>
         </div>
-        <button
-          onClick={handleDownload}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition"
-        >
+        <button onClick={handleDownload} className="btn-primary flex-shrink-0">
+          <Download className="w-4 h-4" />
           Download
         </button>
-      </div>
+      </motion.div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Preview */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="card overflow-hidden"
+      >
         {showInline && objectUrl && (
           isPdf(mime) ? (
             <iframe
@@ -173,32 +198,39 @@ export default function DocumentViewer() {
               title={doc.original_filename}
             />
           ) : (
-            <div className="flex items-center justify-center p-4 bg-gray-50">
+            <div className="flex items-center justify-center p-4 bg-surface-50">
               <img
                 src={objectUrl}
                 alt={doc.original_filename}
-                className="max-w-full max-h-[75vh] object-contain rounded"
+                className="max-w-full max-h-[75vh] object-contain rounded-xl"
               />
             </div>
           )
         )}
 
         {showInline && !objectUrl && !previewError && (
-          <div className="p-12 text-center text-gray-400">Loading preview...</div>
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-6 h-6 text-brand-500 animate-spin" />
+          </div>
         )}
 
         {isDocx(mime) && (
-          <div className="p-4">
-            {previewLoading && <p className="text-gray-400 text-sm">Rendering document...</p>}
-                {previewError && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
-                {previewError}
-                <button
-                  onClick={handleDownload}
-                  className="block mt-2 text-indigo-600 font-medium hover:underline"
-                >
-                  Download {doc.original_filename}
-                </button>
+          <div className="p-6">
+            {previewLoading && (
+              <div className="flex items-center gap-2 text-sm text-surface-400 mb-4">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Rendering document...
+              </div>
+            )}
+            {previewError && (
+              <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-50 border border-amber-100">
+                <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-amber-800">{previewError}</p>
+                  <button onClick={handleDownload} className="text-sm text-brand-600 font-medium hover:underline mt-1">
+                    Download the file instead
+                  </button>
+                </div>
               </div>
             )}
             <div ref={docxContainerRef} />
@@ -206,26 +238,31 @@ export default function DocumentViewer() {
         )}
 
         {(isXlsx(mime) || isXls(mime)) && (
-          <div className="p-4 overflow-auto">
-            {previewLoading && <p className="text-gray-400 text-sm">Rendering spreadsheet...</p>}
+          <div className="p-6">
+            {previewLoading && (
+              <div className="flex items-center gap-2 text-sm text-surface-400 mb-4">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Rendering spreadsheet...
+              </div>
+            )}
             {previewError && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
-                {previewError}
-                <button
-                  onClick={handleDownload}
-                  className="block mt-2 text-indigo-600 font-medium hover:underline"
-                >
-                  Download {doc.original_filename}
-                </button>
+              <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-50 border border-amber-100">
+                <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-amber-800">{previewError}</p>
+                  <button onClick={handleDownload} className="text-sm text-brand-600 font-medium hover:underline mt-1">
+                    Download the file instead
+                  </button>
+                </div>
               </div>
             )}
             {xlsxHeaders.length > 0 && (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-xl border border-surface-200">
                 <table className="w-full text-sm border-collapse">
                   <thead>
-                    <tr className="bg-gray-50">
+                    <tr className="bg-surface-50">
                       {xlsxHeaders.map((h, i) => (
-                        <th key={i} className="px-4 py-3 text-left font-semibold text-gray-700 border-b border-gray-200 whitespace-nowrap">
+                        <th key={i} className="px-4 py-3 text-left font-semibold text-surface-700 border-b border-surface-200 whitespace-nowrap text-xs uppercase tracking-wider">
                           {h}
                         </th>
                       ))}
@@ -233,9 +270,9 @@ export default function DocumentViewer() {
                   </thead>
                   <tbody>
                     {xlsxRows.map((row, ri) => (
-                      <tr key={ri} className={ri % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
+                      <tr key={ri} className={ri % 2 === 0 ? 'bg-white' : 'bg-surface-50/50'}>
                         {row.map((cell, ci) => (
-                          <td key={ci} className="px-4 py-2.5 border-b border-gray-100 text-gray-700 whitespace-nowrap">
+                          <td key={ci} className="px-4 py-2.5 border-b border-surface-100 text-surface-600 whitespace-nowrap">
                             {cell}
                           </td>
                         ))}
@@ -249,17 +286,17 @@ export default function DocumentViewer() {
         )}
 
         {isDoc(mime) && (
-          <div className="p-12 text-center text-gray-400">
-            <p className="mb-4">Legacy Word documents (.doc) cannot be previewed in the browser.</p>
-            <button
-              onClick={handleDownload}
-              className="text-indigo-600 font-medium hover:underline"
-            >
-              Download {doc.original_filename}
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <FileText className="w-12 h-12 text-surface-300 mb-4" />
+            <p className="text-surface-500 font-medium mb-1">Legacy .doc format</p>
+            <p className="text-sm text-surface-400 mb-4">Preview not available for legacy Word documents.</p>
+            <button onClick={handleDownload} className="btn-primary">
+              <Download className="w-4 h-4" />
+              Download
             </button>
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   )
 }
