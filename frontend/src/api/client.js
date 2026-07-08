@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const api = axios.create({
   baseURL: '/api',
-  timeout: 10000,
+  timeout: 60000,
   headers: { 'Content-Type': 'application/json' },
 })
 
@@ -23,5 +23,10 @@ api.interceptors.response.use(
     return Promise.reject(err)
   },
 )
+
+export async function askQuestion(question) {
+  const { data } = await api.post('/chat', { question })
+  return data
+}
 
 export default api

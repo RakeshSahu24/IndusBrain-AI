@@ -87,6 +87,15 @@ def chunk_text(text: str, chunk_size: int = None, chunk_overlap: int = None) -> 
     return chunks
 
 
+def _detect_pages(text: str) -> str:
+    pages = re.findall(r"\[Page (\d+)\]", text)
+    if pages:
+        if len(pages) == 1:
+            return pages[0]
+        return f"{pages[0]}-{pages[-1]}"
+    return ""
+
+
 def index_document(document_id: int, text: str, metadata: dict) -> int:
     if not text or not text.strip():
         return 0
@@ -103,10 +112,12 @@ def index_document(document_id: int, text: str, metadata: dict) -> int:
     for i, chunk in enumerate(chunks):
         ids.append(str(uuid.uuid4()))
         documents.append(chunk)
+        page = _detect_pages(chunk)
         meta = {
             "document_id": document_id,
             "chunk_index": i,
             "total_chunks": len(chunks),
+            "pages": page,
         }
         meta.update(metadata)
         metadatas.append(meta)
@@ -147,3 +158,53 @@ def query_similar(query: str, top_k: int = 5, where: Optional[dict] = None) -> l
                 "distance": results["distances"][0][i] if results.get("distances") else None,
             })
     return hits
+
+
+def generate_answer(question: str, context_chunks: list[dict]) -> dict:
+    key = _api_key()
+    if not key:
+        raise ValueError(
+            "Gemini API key not configured. "
+            "Set GEMINI_API_KEY in .env or export GOOGLE_API_KEY."
+        )
+    genai.configure(api_key=key)
+
+    sources = []
+    context_parts = []
+    for i, chunk in enumerate(context_chunks):
+        meta = chunk["metadata"]
+        source_name = meta.get("original_filename", f"Document {meta['document_id']}")
+        pages = meta.get("pages", "")
+        chunk_label = f"Chunk {meta['chunk_index'] + 1}/{meta['total_chunks']}"
+        page_info = f" (Page {pages})" if pages else ""
+        label = f"[Source {i + 1}] {source_name}{page_info} ({chunk_label})"
+        context_parts.append(f"{label}\n{chunk['document']}")
+        sources.append({
+            "source": source_name,
+            "pages": pages or None,
+            "chunk_index": meta["chunk_index"],
+            "total_chunks": meta["total_chunks"],
+            "document_id": meta["document_id"],
+            "distance": chunk.get("distance"),
+        })
+
+    context_text = "\n\n".join(context_parts)
+
+    prompt = f"""You are an AI assistant for IndusBrain AI. Answer the user's question based ONLY on the provided context. If the context does not contain enough information to answer, say so clearly.
+
+For each fact or statement you make, cite the source using the [Source X] labels in your answer. Always include the source name and page numbers when available.
+
+Context:
+{context_text}
+
+Question: {question}
+
+Answer:"""
+
+    model = genai.GenerativeModel(settings.GEMINI_CHAT_MODEL)
+    response = model.generate_content(prompt)
+
+    return {
+        "answer": response.text,
+        "sources": sources,
+    }

@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     CHUNK_SIZE: int = 1000
     CHUNK_OVERLAP: int = 200
     EMBEDDING_MODEL: str = "models/gemini-embedding-001"
+    GEMINI_CHAT_MODEL: str = "models/gemini-2.5-flash"
 
     class Config:
         env_file = _find_env_file()

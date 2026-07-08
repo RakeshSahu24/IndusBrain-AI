@@ -35,8 +35,10 @@ def _extract_pdf(file_path: str) -> str | None:
         return None
 
     text_parts = []
-    for page in doc:
-        text_parts.append(page.get_text())
+    for i, page in enumerate(doc, start=1):
+        page_text = page.get_text().strip()
+        if page_text:
+            text_parts.append(f"[Page {i}]\n{page_text}")
 
     doc.close()
     plain = "\n".join(text_parts).strip()
@@ -63,7 +65,7 @@ def _ocr_pdf(file_path: str) -> str | None:
         return None
 
     text_parts = []
-    for page in doc:
+    for i, page in enumerate(doc, start=1):
         pix = page.get_pixmap(dpi=200)
         img_bytes = pix.tobytes("png")
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
@@ -71,7 +73,9 @@ def _ocr_pdf(file_path: str) -> str | None:
             tmp_path = tmp.name
         try:
             result = reader.readtext(tmp_path, detail=0, paragraph=True)
-            text_parts.extend(result)
+            page_text = "\n".join(result)
+            if page_text.strip():
+                text_parts.append(f"[Page {i}]\n{page_text}")
         finally:
             os.unlink(tmp_path)
 

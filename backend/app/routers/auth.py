@@ -37,3 +37,18 @@ def me(current_user: User = Depends(get_current_user)):
 @router.get("/admin")
 def admin_dashboard(current_user: User = Depends(require_role("admin"))):
     return {"message": f"Welcome admin {current_user.full_name}", "email": current_user.email}
+
+@router.get("/users")
+def list_users(db: Session = Depends(get_db), current_user: User = Depends(require_role("admin"))):
+    users = db.query(User).all()
+    return [
+        {
+            "id": u.id,
+            "email": u.email,
+            "full_name": u.full_name,
+            "role": u.role,
+            "is_active": u.is_active,
+            "created_at": u.created_at.isoformat() if u.created_at else None,
+        }
+        for u in users
+    ]
