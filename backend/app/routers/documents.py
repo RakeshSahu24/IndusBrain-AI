@@ -11,6 +11,7 @@ from app.models.document import Document
 from app.schemas.document import DocumentResponse
 from app.config import get_settings
 from app.services.parser import extract_text
+from app.services.chroma_service import index_document, delete_document_chunks
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 settings = get_settings()
@@ -98,6 +99,20 @@ def upload_file(
             doc.text_content = text
             db.commit()
             db.refresh(doc)
+
+        if text:
+            try:
+                num_chunks = index_document(
+                    document_id=doc.id,
+                    text=text,
+                    metadata={
+                        "original_filename": doc.original_filename,
+                        "mime_type": doc.mime_type,
+                        "user_id": doc.user_id,
+                    },
+                )
+            except Exception:
+                pass
     except Exception:
         pass
 
@@ -141,6 +156,11 @@ def delete_document(
 
     if os.path.exists(doc.file_path):
         os.remove(doc.file_path)
+
+    try:
+        delete_document_chunks(doc.id)
+    except Exception:
+        pass
 
     db.delete(doc)
     db.commit()
