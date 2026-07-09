@@ -29,4 +29,9 @@ export async function askQuestion(question) {
   return data
 }
 
+export async function getChatHistory() {
+  const { data } = await api.get('/chat/history')
+  return data
+}
+
 export default api

@@ -11,7 +11,7 @@ import {
   Loader2,
   MessageSquareText,
 } from 'lucide-react'
-import { askQuestion } from '../api/client'
+import { askQuestion, getChatHistory } from '../api/client'
 
 const suggestions = [
   'Summarize my documents',
@@ -24,6 +24,17 @@ export default function Chat() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef(null)
+
+  useEffect(() => {
+    getChatHistory().then((history) => {
+      const msgs = history.map((m) =>
+        m.role === 'assistant'
+          ? { role: 'assistant', answer: m.content, sources: [] }
+          : { role: 'user', content: m.content }
+      )
+      setMessages(msgs)
+    }).catch(() => {})
+  }, [])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
