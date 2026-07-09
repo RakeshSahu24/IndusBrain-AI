@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     CHUNK_OVERLAP: int = 200
     EMBEDDING_MODEL: str = "models/gemini-embedding-001"
     GEMINI_CHAT_MODEL: str = "models/gemini-2.5-flash"
+    NEO4J_URI: str = "bolt://localhost:7687"
+    NEO4J_USER: str = "neo4j"
+    NEO4J_PASSWORD: str = "indusbrain"
 
     class Config:
         env_file = _find_env_file()

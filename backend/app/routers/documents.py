@@ -12,6 +12,10 @@ from app.schemas.document import DocumentResponse
 from app.config import get_settings
 from app.services.parser import extract_text
 from app.services.chroma_service import index_document, delete_document_chunks
+from app.services.entity_extractor import extract_entities_from_text
+from app.services.graph_service import build_graph_from_entities, get_graph_by_document
+from app.models.entity import ExtractedEntity
+from app.schemas.entity import EntityResponse, EntityGroupResponse
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 settings = get_settings()
@@ -113,6 +117,27 @@ def upload_file(
                 )
             except Exception:
                 pass
+
+        entities = None
+        try:
+            entities = extract_entities_from_text(text)
+            for ent in entities:
+                db.add(ExtractedEntity(
+                    document_id=doc.id,
+                    entity_type=ent.get("type", ""),
+                    entity_value=ent.get("value", ""),
+                    page_number=ent.get("page"),
+                    confidence=ent.get("confidence"),
+                ))
+            db.commit()
+        except Exception:
+            pass
+
+        if entities:
+            try:
+                build_graph_from_entities(doc.id, doc.original_filename, entities)
+            except Exception:
+                pass
     except Exception:
         pass
 
@@ -162,6 +187,19 @@ def delete_document(
     except Exception:
         pass
 
+    db.query(ExtractedEntity).filter(ExtractedEntity.document_id == doc.id).delete()
+    report_id = f"report_{doc.id}"
+    try:
+        from app.services.graph_service import _get_driver
+        driver = _get_driver()
+        if driver:
+            with driver.session() as session:
+                session.run("MATCH (r:Report {id: $rid}) DETACH DELETE r", {"rid": report_id})
+                session.run("MATCH (n) WHERE NOT (n)--() DELETE n", {})
+            driver.close()
+    except Exception:
+        pass
+
     db.delete(doc)
     db.commit()
 
@@ -205,3 +243,47 @@ def view_document(
     else:
         response.headers["Content-Disposition"] = f'attachment; filename="{doc.original_filename}"'
     return response
+
+
+@router.get("/{document_id}/entities", response_model=list[EntityResponse])
+def get_document_entities(
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    doc = db.query(Document).filter(Document.id == document_id, Document.user_id == current_user.id).first()
+    if not doc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+    return db.query(ExtractedEntity).filter(ExtractedEntity.document_id == document_id).all()
+
+
+@router.get("/entities/summary", response_model=EntityGroupResponse)
+def get_entities_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    docs = db.query(Document).filter(Document.user_id == current_user.id).all()
+    if not docs:
+        return EntityGroupResponse(document_id=0, document_filename="", entities={})
+
+    all_entities = (
+        db.query(ExtractedEntity)
+        .join(Document)
+        .filter(Document.user_id == current_user.id)
+        .order_by(ExtractedEntity.entity_type)
+        .all()
+    )
+
+    grouped: dict[str, list[EntityResponse]] = {}
+    for ent in all_entities:
+        t = ent.entity_type
+        if t not in grouped:
+            grouped[t] = []
+        grouped[t].append(EntityResponse.model_validate(ent))
+
+    first_doc = docs[0]
+    return EntityGroupResponse(
+        document_id=first_doc.id,
+        document_filename=first_doc.original_filename,
+        entities=grouped,
+    )
