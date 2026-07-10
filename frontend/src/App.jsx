@@ -9,6 +9,7 @@ import Chat from './pages/Chat'
 import DocumentViewer from './pages/DocumentViewer'
 import AdminDashboard from './pages/AdminDashboard'
 import About from './pages/About'
+import KnowledgeGraph from './pages/KnowledgeGraph'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 
@@ -90,6 +91,14 @@ export default function App() {
         element={
           <ProtectedLayout>
             <About />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/knowledge-graph"
+        element={
+          <ProtectedLayout>
+            <KnowledgeGraph />
           </ProtectedLayout>
         }
       />

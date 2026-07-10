@@ -188,15 +188,14 @@ def delete_document(
         pass
 
     db.query(ExtractedEntity).filter(ExtractedEntity.document_id == doc.id).delete()
-    report_id = f"report_{doc.id}"
     try:
-        from app.services.graph_service import _get_driver
+        from app.services.graph_service import _get_driver, cleanup_orphans
+        report_id = f"report_{doc.id}"
         driver = _get_driver()
         if driver:
             with driver.session() as session:
                 session.run("MATCH (r:Report {id: $rid}) DETACH DELETE r", {"rid": report_id})
-                session.run("MATCH (n) WHERE NOT (n)--() DELETE n", {})
-            driver.close()
+            cleanup_orphans()
     except Exception:
         pass
 

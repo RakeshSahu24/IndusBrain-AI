@@ -1,0 +1,317 @@
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
+import {
+  ReactFlow,
+  Background,
+  Controls,
+  MiniMap,
+  Handle,
+  Position,
+  useNodesState,
+  useEdgesState,
+} from '@xyflow/react'
+import '@xyflow/react/dist/style.css'
+import { motion } from 'framer-motion'
+import {
+  Factory,
+  FileText,
+  Users,
+  AlertTriangle,
+  Building2,
+  CalendarClock,
+  X,
+  RefreshCw,
+  Loader2,
+  Share2,
+} from 'lucide-react'
+import api from '../api/client'
+import dagre from 'dagre'
+
+const NODE_WIDTH = 180
+const NODE_HEIGHT = 80
+
+const nodeVisuals = {
+  Equipment: { icon: Factory, gradient: 'from-sky-500 to-blue-600', color: '#0ea5e9' },
+  Report: { icon: FileText, gradient: 'from-amber-500 to-orange-600', color: '#f59e0b' },
+  Operator: { icon: Users, gradient: 'from-violet-500 to-purple-600', color: '#8b5cf6' },
+  Failure: { icon: AlertTriangle, gradient: 'from-rose-500 to-red-600', color: '#ef4444' },
+  Plant: { icon: Building2, gradient: 'from-emerald-500 to-teal-600', color: '#10b981' },
+  MaintenanceRecord: { icon: CalendarClock, gradient: 'from-cyan-500 to-teal-600', color: '#06b6d4' },
+}
+
+function KnowledgeNode({ data }) {
+  const v = nodeVisuals[data.label] || { icon: FileText, gradient: 'from-surface-400 to-surface-500', color: '#94a3b8' }
+  const Icon = v.icon
+
+  return (
+    <div className="relative group">
+      <Handle type="target" position={Position.Top} className="!bg-surface-400 !w-2 !h-2" />
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        className="card p-3 min-w-[160px] cursor-pointer transition-all duration-200 hover:shadow-lg"
+        onClick={() => data.onSelect?.(data)}
+      >
+        <div className="flex items-center gap-2.5 mb-1.5">
+          <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${v.gradient} flex items-center justify-center shadow-sm shrink-0`}>
+            <Icon className="w-3.5 h-3.5 text-white" />
+          </div>
+          <span className="badge-info text-[10px] uppercase tracking-wider leading-none">{data.label}</span>
+        </div>
+        <p className="text-sm font-semibold text-surface-900 truncate">{data.name}</p>
+        {data.id && (
+          <p className="text-[10px] text-surface-400 mt-0.5 truncate font-mono">{data.id}</p>
+        )}
+      </motion.div>
+      <Handle type="source" position={Position.Bottom} className="!bg-surface-400 !w-2 !h-2" />
+    </div>
+  )
+}
+
+const nodeTypes = { knowledge: KnowledgeNode }
+
+function layoutGraph(nodes, edges) {
+  const g = new dagre.graphlib.Graph()
+  g.setDefaultEdgeLabel(() => ({}))
+  g.setGraph({ rankdir: 'TB', nodesep: 60, ranksep: 100, marginx: 40, marginy: 40 })
+
+  nodes.forEach((n) => g.setNode(n.id, { width: NODE_WIDTH, height: NODE_HEIGHT }))
+  edges.forEach((e) => g.setEdge(e.source, e.target))
+
+  dagre.layout(g)
+
+  return nodes.map((n) => {
+    const pos = g.node(n.id)
+    return {
+      ...n,
+      position: { x: pos.x - NODE_WIDTH / 2, y: pos.y - NODE_HEIGHT / 2 },
+    }
+  })
+}
+
+export default function KnowledgeGraph() {
+  const [nodes, setNodes, onNodesChange] = useNodesState([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [selectedNode, setSelectedNode] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const reactFlowRef = useRef(null)
+
+  const fetchGraph = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const { data } = await api.get('/graph')
+      const apiNodes = (data.nodes || []).map((n) => ({
+        id: n.id,
+        type: 'knowledge',
+        data: {
+          id: n.id,
+          label: n.label,
+          name: n.name,
+          onSelect: () => {},
+        },
+      }))
+      const apiEdges = (data.edges || []).map((e) => ({
+        id: `e-${e.source}-${e.target}`,
+        source: e.source,
+        target: e.target,
+        animated: true,
+        style: {
+          stroke: '#6366f1',
+          strokeWidth: 1.5,
+        },
+        label: e.label,
+      }))
+
+      if (apiNodes.length === 0) {
+        setNodes([])
+        setEdges([])
+      } else {
+        const laidOut = layoutGraph(apiNodes, apiEdges)
+        setNodes(laidOut)
+        setEdges(apiEdges)
+      }
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to load knowledge graph')
+    } finally {
+      setLoading(false)
+    }
+  }, [setNodes, setEdges])
+
+  useEffect(() => {
+    fetchGraph()
+  }, [fetchGraph])
+
+  const onNodeClick = useCallback(
+    (_, node) => {
+      setSelectedNode(node.data)
+    },
+    [],
+  )
+
+  const onSelect = useCallback((data) => {
+    setSelectedNode(data)
+  }, [])
+
+  const nodesWithHandler = useMemo(
+    () =>
+      nodes.map((n) => ({
+        ...n,
+        data: { ...n.data, onSelect },
+      })),
+    [nodes, onSelect],
+  )
+
+  const legend = useMemo(
+    () =>
+      Object.entries(nodeVisuals).map(([key, v]) => ({
+        key,
+        label: key === 'MaintenanceRecord' ? 'Maintenance' : key,
+        icon: v.icon,
+      })),
+    [],
+  )
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
+        <div className="flex flex-col items-center gap-3 text-surface-400">
+          <Loader2 className="w-8 h-8 animate-spin" />
+          <p className="text-sm">Loading knowledge graph...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
+        <div className="card p-8 text-center max-w-md">
+          <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+          <p className="text-sm font-medium text-surface-900 mb-1">Unable to load graph</p>
+          <p className="text-xs text-surface-400 mb-4">{error}</p>
+          <button onClick={fetchGraph} className="btn-primary text-xs">
+            <RefreshCw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (nodes.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
+        <div className="card p-8 text-center max-w-md">
+          <Share2 className="w-10 h-10 text-surface-300 mx-auto mb-3" />
+          <p className="text-sm font-semibold text-surface-900 mb-1">No knowledge graph yet</p>
+          <p className="text-xs text-surface-400 leading-relaxed">
+            Upload documents to automatically build a knowledge graph of equipment, failures, operators, and more.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="h-[calc(100vh-10rem)] relative">
+      <div className="absolute top-4 left-4 z-10 flex flex-wrap gap-1.5">
+        {legend.map((item) => {
+          const Icon = item.icon
+          return (
+            <div
+              key={item.key}
+              className="glass flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-surface-600"
+            >
+              <Icon className="w-3 h-3" />
+              {item.label}
+            </div>
+          )
+        })}
+        <button
+          onClick={fetchGraph}
+          className="glass flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-surface-500 hover:text-surface-700 transition-colors ml-1"
+          title="Refresh graph"
+        >
+          <RefreshCw className="w-3 h-3" />
+          Refresh
+        </button>
+      </div>
+
+      <ReactFlow
+        ref={reactFlowRef}
+        nodes={nodesWithHandler}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onNodeClick={onNodeClick}
+        nodeTypes={nodeTypes}
+        fitView
+        fitViewOptions={{ padding: 0.25 }}
+        minZoom={0.3}
+        maxZoom={2}
+        className="rounded-2xl"
+      >
+        <Background color="#e2e8f0" gap={20} size={1} />
+        <Controls className="!rounded-xl !border-surface-200 !shadow-sm" />
+        <MiniMap
+          className="!rounded-xl !border-surface-200 !shadow-sm"
+          nodeColor={(n) => nodeVisuals[n.data?.label]?.color || '#6366f1'}
+          maskColor="rgba(0,0,0,0.08)"
+        />
+      </ReactFlow>
+
+      {selectedNode && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="card max-w-sm w-full mx-4 p-6"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div
+                  className={`w-10 h-10 rounded-xl bg-gradient-to-br ${(nodeVisuals[selectedNode.label] || nodeVisuals.Report).gradient} flex items-center justify-center shrink-0`}
+                >
+                  {(() => {
+                    const Icon = (nodeVisuals[selectedNode.label] || nodeVisuals.Report).icon
+                    return Icon ? <Icon className="w-5 h-5 text-white" /> : null
+                  })()}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-surface-900 truncate">{selectedNode.name}</p>
+                  <p className="badge-info text-[10px]">{selectedNode.label}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedNode(null)}
+                className="p-1.5 rounded-lg text-surface-400 hover:text-surface-600 hover:bg-surface-100 transition-colors shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-2 text-sm text-surface-500">
+              <div className="flex items-center gap-2">
+                <span className="text-surface-400 font-medium shrink-0">Node ID:</span>
+                <span className="font-mono text-[11px] truncate">{selectedNode.id}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-surface-400 font-medium shrink-0">Label:</span>
+                <span>{selectedNode.label}</span>
+              </div>
+            </div>
+
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => setSelectedNode(null)}
+                className="btn-secondary flex-1 text-xs"
+              >
+                Close
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </div>
+  )
+}

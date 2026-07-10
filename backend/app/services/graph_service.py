@@ -363,3 +363,19 @@ def get_graph_by_document(document_id: int) -> dict:
 
 def clear_graph():
     _run_query("MATCH (n) DETACH DELETE n")
+
+
+def cleanup_orphans():
+    driver = _get_driver()
+    if not driver:
+        return
+    try:
+        with driver.session() as session:
+            session.run("""
+                MATCH (n)
+                WHERE NOT (n:Report)
+                  AND NOT EXISTS { MATCH (n)-[*]-(:Report) }
+                DETACH DELETE n
+            """)
+    except Exception:
+        pass

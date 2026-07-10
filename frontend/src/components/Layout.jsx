@@ -12,6 +12,7 @@ import {
   Brain,
   ChevronRight,
   User,
+  Share2,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
@@ -19,6 +20,7 @@ const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/upload', label: 'Upload', icon: Upload },
   { to: '/chat', label: 'AI Chat', icon: MessageSquareText },
+  { to: '/knowledge-graph', label: 'Knowledge Graph', icon: Share2 },
 ]
 
 const adminItems = [
