@@ -39,11 +39,11 @@ export default function Login() {
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-brand-500/20">
             <Brain className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-surface-900">Welcome back</h1>
-          <p className="text-sm text-surface-400 mt-1">Sign in to your account</p>
+          <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">Welcome back</h1>
+          <p className="text-sm text-surface-400 dark:text-surface-500 mt-1">Sign in to your account</p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-surface-200/60 shadow-sm p-8">
+        <div className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200/60 shadow-sm p-8">
           {error && (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
@@ -56,9 +56,9 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1.5">Email</label>
+              <label className="block text-sm font-medium text-surface-700 dark:text-surface-200 mb-1.5">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400 dark:text-surface-500" />
                 <input
                   type="email"
                   value={email}
@@ -71,9 +71,9 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1.5">Password</label>
+              <label className="block text-sm font-medium text-surface-700 dark:text-surface-200 mb-1.5">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400 dark:text-surface-500" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -85,7 +85,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-surface-400 dark:text-surface-500 hover:text-surface-600"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -105,7 +105,7 @@ export default function Login() {
           </form>
         </div>
 
-        <p className="text-center mt-6 text-sm text-surface-400">
+        <p className="text-center mt-6 text-sm text-surface-400 dark:text-surface-500">
           Don&apos;t have an account?{' '}
           <Link to="/register" className="text-brand-600 hover:text-brand-700 font-medium hover:underline">
             Create one

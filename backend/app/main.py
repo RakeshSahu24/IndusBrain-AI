@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.database import engine, Base
-from app.routers import health, auth, documents, chat, graph
+from app.routers import health, auth, documents, chat, graph, rca, compliance
 
 settings = get_settings()
 
@@ -29,3 +29,5 @@ app.include_router(auth.router)
 app.include_router(documents.router)
 app.include_router(chat.router)
 app.include_router(graph.router)
+app.include_router(rca.router)
+app.include_router(compliance.router)

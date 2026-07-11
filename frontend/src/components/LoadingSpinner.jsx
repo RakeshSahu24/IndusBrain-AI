@@ -10,7 +10,7 @@ export default function LoadingSpinner({ size = 20, text = 'Loading...' }) {
       >
         <Loader2 className="w-6 h-6 text-brand-500" />
       </motion.div>
-      <p className="text-sm text-surface-400">{text}</p>
+      <p className="text-sm text-surface-400 dark:text-surface-500">{text}</p>
     </div>
   )
 }

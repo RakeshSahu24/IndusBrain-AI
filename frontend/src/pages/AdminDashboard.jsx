@@ -32,8 +32,8 @@ export default function AdminDashboard() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-2xl font-bold text-surface-900">Admin Dashboard</h1>
-        <p className="text-sm text-surface-400 mt-1">Manage your platform and users.</p>
+        <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">Admin Dashboard</h1>
+        <p className="text-sm text-surface-400 dark:text-surface-500 mt-1">Manage your platform and users.</p>
       </motion.div>
 
       {adminMessage && (
@@ -61,30 +61,30 @@ export default function AdminDashboard() {
         className="card overflow-hidden"
       >
         <div className="p-5 pb-0">
-          <h2 className="text-base font-semibold text-surface-900">Registered Users</h2>
+          <h2 className="text-base font-semibold text-surface-900 dark:text-surface-100">Registered Users</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-surface-100">
-                <th className="text-left text-xs font-semibold text-surface-400 uppercase tracking-wider px-5 py-4">Name</th>
-                <th className="text-left text-xs font-semibold text-surface-400 uppercase tracking-wider px-5 py-4">Email</th>
-                <th className="text-left text-xs font-semibold text-surface-400 uppercase tracking-wider px-5 py-4">Role</th>
-                <th className="text-left text-xs font-semibold text-surface-400 uppercase tracking-wider px-5 py-4">Status</th>
-                <th className="text-left text-xs font-semibold text-surface-400 uppercase tracking-wider px-5 py-4 hidden md:table-cell">Joined</th>
+              <tr className="border-b border-surface-100 dark:border-surface-700/50">
+                <th className="text-left text-xs font-semibold text-surface-400 dark:text-surface-500 uppercase tracking-wider px-5 py-4">Name</th>
+                <th className="text-left text-xs font-semibold text-surface-400 dark:text-surface-500 uppercase tracking-wider px-5 py-4">Email</th>
+                <th className="text-left text-xs font-semibold text-surface-400 dark:text-surface-500 uppercase tracking-wider px-5 py-4">Role</th>
+                <th className="text-left text-xs font-semibold text-surface-400 dark:text-surface-500 uppercase tracking-wider px-5 py-4">Status</th>
+                <th className="text-left text-xs font-semibold text-surface-400 dark:text-surface-500 uppercase tracking-wider px-5 py-4 hidden md:table-cell">Joined</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-surface-50">
+            <tbody className="divide-y divide-surface-50 dark:divide-surface-800/50">
               {users.map((u, i) => (
                 <motion.tr
                   key={u.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.03 }}
-                  className="hover:bg-surface-50 transition-colors"
+                  className="hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors"
                 >
-                  <td className="px-5 py-3.5 font-medium text-surface-900">{u.full_name}</td>
-                  <td className="px-5 py-3.5 text-surface-500">{u.email}</td>
+                  <td className="px-5 py-3.5 font-medium text-surface-900 dark:text-surface-100">{u.full_name}</td>
+                  <td className="px-5 py-3.5 text-surface-500 dark:text-surface-400">{u.email}</td>
                   <td className="px-5 py-3.5">
                     <span className={`badge capitalize ${u.role === 'admin' ? 'badge-warning' : 'badge-info'}`}>
                       {u.role}
@@ -95,7 +95,7 @@ export default function AdminDashboard() {
                       {u.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                  <td className="px-5 py-3.5 text-surface-400 text-xs hidden md:table-cell">
+                  <td className="px-5 py-3.5 text-surface-400 dark:text-surface-500 text-xs hidden md:table-cell">
                     {u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}
                   </td>
                 </motion.tr>

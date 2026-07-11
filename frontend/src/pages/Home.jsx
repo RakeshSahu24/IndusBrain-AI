@@ -90,7 +90,7 @@ export default function Home() {
             <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
               <Link
                 to="/register"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-surface-900 font-semibold text-sm hover:bg-white/90 transition-all duration-200 shadow-xl shadow-black/10"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-100 font-semibold text-sm hover:bg-white/90 transition-all duration-200 shadow-xl shadow-black/10"
               >
                 Get Started Free
                 <ChevronRight className="w-4 h-4" />
@@ -119,7 +119,7 @@ export default function Home() {
         </div>
 
         {/* Wave divider */}
-        <div className="relative h-16 bg-surface-50" style={{ clipPath: 'ellipse(150% 100% at 50% 100%)' }} />
+        <div className="relative h-16 bg-surface-50 dark:bg-surface-800/50" style={{ clipPath: 'ellipse(150% 100% at 50% 100%)' }} />
       </section>
 
       {/* Features */}
@@ -130,10 +130,10 @@ export default function Home() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl font-bold text-surface-900 mb-4">
+          <h2 className="text-3xl font-bold text-surface-900 dark:text-surface-100 mb-4">
             Everything you need to manage documents
           </h2>
-          <p className="text-surface-400 max-w-2xl mx-auto">
+          <p className="text-surface-400 dark:text-surface-500 max-w-2xl mx-auto">
             From upload to insight — a seamless pipeline powered by cutting-edge AI.
           </p>
         </motion.div>
@@ -146,13 +146,13 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="group relative p-6 rounded-2xl bg-white border border-surface-200/60 hover:shadow-lg hover:border-surface-300/60 transition-all duration-300"
+              className="group relative p-6 rounded-2xl bg-white dark:bg-surface-800 border border-surface-200/60 hover:shadow-lg hover:border-surface-300/60 transition-all duration-300"
             >
               <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 shadow-lg`}>
                 <feature.icon className="w-6 h-6 text-white" strokeWidth={1.5} />
               </div>
-              <h3 className="text-base font-semibold text-surface-900 mb-2">{feature.title}</h3>
-              <p className="text-sm text-surface-400 leading-relaxed">{feature.description}</p>
+              <h3 className="text-base font-semibold text-surface-900 dark:text-surface-100 mb-2">{feature.title}</h3>
+              <p className="text-sm text-surface-400 dark:text-surface-500 leading-relaxed">{feature.description}</p>
             </motion.div>
           ))}
         </div>

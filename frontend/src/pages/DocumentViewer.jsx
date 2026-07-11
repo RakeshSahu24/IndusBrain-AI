@@ -140,8 +140,8 @@ export default function DocumentViewer() {
         <div className="w-16 h-16 rounded-2xl bg-red-100 flex items-center justify-center mb-4">
           <AlertTriangle className="w-8 h-8 text-red-500" />
         </div>
-        <p className="text-lg font-semibold text-surface-900 mb-1">Something went wrong</p>
-        <p className="text-sm text-surface-400 mb-6">{error}</p>
+        <p className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-1">Something went wrong</p>
+        <p className="text-sm text-surface-400 dark:text-surface-500 mb-6">{error}</p>
         <Link to="/upload" className="btn-primary">
           <ArrowLeft className="w-4 h-4" />
           Back to Documents
@@ -164,13 +164,13 @@ export default function DocumentViewer() {
         <div>
           <Link
             to="/upload"
-            className="inline-flex items-center gap-1.5 text-sm text-surface-400 hover:text-surface-600 transition-colors mb-2"
+            className="inline-flex items-center gap-1.5 text-sm text-surface-400 dark:text-surface-500 hover:text-surface-600 transition-colors mb-2"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Documents
           </Link>
-          <h1 className="text-xl font-bold text-surface-900">{doc.original_filename}</h1>
-          <div className="flex items-center gap-3 mt-1 text-sm text-surface-400">
+          <h1 className="text-xl font-bold text-surface-900 dark:text-surface-100">{doc.original_filename}</h1>
+          <div className="flex items-center gap-3 mt-1 text-sm text-surface-400 dark:text-surface-500">
             <span className="flex items-center gap-1">
               <HardDrive className="w-3.5 h-3.5" />
               {formatSize(doc.file_size)}
@@ -207,7 +207,7 @@ export default function DocumentViewer() {
               title={doc.original_filename}
             />
           ) : (
-            <div className="flex items-center justify-center p-4 bg-surface-50">
+            <div className="flex items-center justify-center p-4 bg-surface-50 dark:bg-surface-800/50">
               <img
                 src={objectUrl}
                 alt={doc.original_filename}
@@ -226,7 +226,7 @@ export default function DocumentViewer() {
         {isDocx(mime) && (
           <div className="p-6">
             {previewLoading && (
-              <div className="flex items-center gap-2 text-sm text-surface-400 mb-4">
+              <div className="flex items-center gap-2 text-sm text-surface-400 dark:text-surface-500 mb-4">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Rendering document...
               </div>
@@ -249,7 +249,7 @@ export default function DocumentViewer() {
         {(isXlsx(mime) || isXls(mime)) && (
           <div className="p-6">
             {previewLoading && (
-              <div className="flex items-center gap-2 text-sm text-surface-400 mb-4">
+              <div className="flex items-center gap-2 text-sm text-surface-400 dark:text-surface-500 mb-4">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Rendering spreadsheet...
               </div>
@@ -266,12 +266,12 @@ export default function DocumentViewer() {
               </div>
             )}
             {xlsxHeaders.length > 0 && (
-              <div className="overflow-x-auto rounded-xl border border-surface-200">
+              <div className="overflow-x-auto rounded-xl border border-surface-200 dark:border-surface-700">
                 <table className="w-full text-sm border-collapse">
                   <thead>
-                    <tr className="bg-surface-50">
+                    <tr className="bg-surface-50 dark:bg-surface-800/50">
                       {xlsxHeaders.map((h, i) => (
-                        <th key={i} className="px-4 py-3 text-left font-semibold text-surface-700 border-b border-surface-200 whitespace-nowrap text-xs uppercase tracking-wider">
+                        <th key={i} className="px-4 py-3 text-left font-semibold text-surface-700 dark:text-surface-200 border-b border-surface-200 dark:border-surface-700 whitespace-nowrap text-xs uppercase tracking-wider">
                           {h}
                         </th>
                       ))}
@@ -279,9 +279,9 @@ export default function DocumentViewer() {
                   </thead>
                   <tbody>
                     {xlsxRows.map((row, ri) => (
-                      <tr key={ri} className={ri % 2 === 0 ? 'bg-white' : 'bg-surface-50/50'}>
+                      <tr key={ri} className={ri % 2 === 0 ? 'bg-white dark:bg-surface-800' : 'bg-surface-50/50'}>
                         {row.map((cell, ci) => (
-                          <td key={ci} className="px-4 py-2.5 border-b border-surface-100 text-surface-600 whitespace-nowrap">
+                          <td key={ci} className="px-4 py-2.5 border-b border-surface-100 dark:border-surface-700/50 text-surface-600 dark:text-surface-300 whitespace-nowrap">
                             {cell}
                           </td>
                         ))}
@@ -297,8 +297,8 @@ export default function DocumentViewer() {
         {isDoc(mime) && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <FileText className="w-12 h-12 text-surface-300 mb-4" />
-            <p className="text-surface-500 font-medium mb-1">Legacy .doc format</p>
-            <p className="text-sm text-surface-400 mb-4">Preview not available for legacy Word documents.</p>
+            <p className="text-surface-500 dark:text-surface-400 font-medium mb-1">Legacy .doc format</p>
+            <p className="text-sm text-surface-400 dark:text-surface-500 mb-4">Preview not available for legacy Word documents.</p>
             <button onClick={handleDownload} className="btn-primary">
               <Download className="w-4 h-4" />
               Download

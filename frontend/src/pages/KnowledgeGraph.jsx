@@ -56,9 +56,9 @@ function KnowledgeNode({ data }) {
           </div>
           <span className="badge-info text-[10px] uppercase tracking-wider leading-none">{data.label}</span>
         </div>
-        <p className="text-sm font-semibold text-surface-900 truncate">{data.name}</p>
+        <p className="text-sm font-semibold text-surface-900 dark:text-surface-100 truncate">{data.name}</p>
         {data.id && (
-          <p className="text-[10px] text-surface-400 mt-0.5 truncate font-mono">{data.id}</p>
+          <p className="text-[10px] text-surface-400 dark:text-surface-500 mt-0.5 truncate font-mono">{data.id}</p>
         )}
       </motion.div>
       <Handle type="source" position={Position.Bottom} className="!bg-surface-400 !w-2 !h-2" />
@@ -174,7 +174,7 @@ export default function KnowledgeGraph() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
-        <div className="flex flex-col items-center gap-3 text-surface-400">
+        <div className="flex flex-col items-center gap-3 text-surface-400 dark:text-surface-500">
           <Loader2 className="w-8 h-8 animate-spin" />
           <p className="text-sm">Loading knowledge graph...</p>
         </div>
@@ -187,8 +187,8 @@ export default function KnowledgeGraph() {
       <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
         <div className="card p-8 text-center max-w-md">
           <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
-          <p className="text-sm font-medium text-surface-900 mb-1">Unable to load graph</p>
-          <p className="text-xs text-surface-400 mb-4">{error}</p>
+          <p className="text-sm font-medium text-surface-900 dark:text-surface-100 mb-1">Unable to load graph</p>
+          <p className="text-xs text-surface-400 dark:text-surface-500 mb-4">{error}</p>
           <button onClick={fetchGraph} className="btn-primary text-xs">
             <RefreshCw className="w-3.5 h-3.5" />
             Retry
@@ -203,8 +203,8 @@ export default function KnowledgeGraph() {
       <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
         <div className="card p-8 text-center max-w-md">
           <Share2 className="w-10 h-10 text-surface-300 mx-auto mb-3" />
-          <p className="text-sm font-semibold text-surface-900 mb-1">No knowledge graph yet</p>
-          <p className="text-xs text-surface-400 leading-relaxed">
+          <p className="text-sm font-semibold text-surface-900 dark:text-surface-100 mb-1">No knowledge graph yet</p>
+          <p className="text-xs text-surface-400 dark:text-surface-500 leading-relaxed">
             Upload documents to automatically build a knowledge graph of equipment, failures, operators, and more.
           </p>
         </div>
@@ -220,7 +220,7 @@ export default function KnowledgeGraph() {
           return (
             <div
               key={item.key}
-              className="glass flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-surface-600"
+              className="glass flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-surface-600 dark:text-surface-300"
             >
               <Icon className="w-3 h-3" />
               {item.label}
@@ -229,7 +229,7 @@ export default function KnowledgeGraph() {
         })}
         <button
           onClick={fetchGraph}
-          className="glass flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-surface-500 hover:text-surface-700 transition-colors ml-1"
+          className="glass flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-200 transition-colors ml-1"
           title="Refresh graph"
         >
           <RefreshCw className="w-3 h-3" />
@@ -278,25 +278,25 @@ export default function KnowledgeGraph() {
                   })()}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-surface-900 truncate">{selectedNode.name}</p>
+                  <p className="text-sm font-semibold text-surface-900 dark:text-surface-100 truncate">{selectedNode.name}</p>
                   <p className="badge-info text-[10px]">{selectedNode.label}</p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedNode(null)}
-                className="p-1.5 rounded-lg text-surface-400 hover:text-surface-600 hover:bg-surface-100 transition-colors shrink-0"
+                className="p-1.5 rounded-lg text-surface-400 dark:text-surface-500 hover:text-surface-600 hover:bg-surface-100 transition-colors shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-2 text-sm text-surface-500">
+            <div className="space-y-2 text-sm text-surface-500 dark:text-surface-400">
               <div className="flex items-center gap-2">
-                <span className="text-surface-400 font-medium shrink-0">Node ID:</span>
+                <span className="text-surface-400 dark:text-surface-500 font-medium shrink-0">Node ID:</span>
                 <span className="font-mono text-[11px] truncate">{selectedNode.id}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-surface-400 font-medium shrink-0">Label:</span>
+                <span className="text-surface-400 dark:text-surface-500 font-medium shrink-0">Label:</span>
                 <span>{selectedNode.label}</span>
               </div>
             </div>

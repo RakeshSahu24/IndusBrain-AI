@@ -24,17 +24,17 @@ export default function StatCard({ label, value, icon: Icon, color = 'blue', ind
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.08, ease: 'easeOut' }}
-      className="group relative overflow-hidden rounded-2xl bg-white border border-surface-200/60 p-5 hover:shadow-lg transition-all duration-300"
+      className="group relative overflow-hidden rounded-2xl bg-white dark:bg-surface-800 border border-surface-200/60 dark:border-surface-700/60 p-5 hover:shadow-lg transition-all duration-300"
     >
       {/* Gradient accent bar */}
       <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${gradientMap[color]}`} />
 
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <p className="text-sm font-medium text-surface-400">{label}</p>
-          <p className="text-2xl font-bold text-surface-900 tracking-tight">
+          <p className="text-sm font-medium text-surface-400 dark:text-surface-500">{label}</p>
+          <p className="text-2xl font-bold text-surface-900 dark:text-surface-100 tracking-tight">
             {value}
-            {suffix && <span className="text-sm font-medium text-surface-400 ml-1">{suffix}</span>}
+            {suffix && <span className="text-sm font-medium text-surface-400 dark:text-surface-500 ml-1">{suffix}</span>}
           </p>
         </div>
         <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${gradientMap[color]} flex items-center justify-center shadow-lg ${shadowMap[color]}`}>

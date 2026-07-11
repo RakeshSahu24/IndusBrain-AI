@@ -41,8 +41,8 @@ export default function Register() {
           <div className="w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 className="w-8 h-8 text-emerald-600" />
           </div>
-          <h2 className="text-2xl font-bold text-surface-900 mb-2">Registration Successful!</h2>
-          <p className="text-surface-400">Redirecting to login...</p>
+          <h2 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">Registration Successful!</h2>
+          <p className="text-surface-400 dark:text-surface-500">Redirecting to login...</p>
         </motion.div>
       </div>
     )
@@ -60,11 +60,11 @@ export default function Register() {
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-brand-500/20">
             <Brain className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-surface-900">Create account</h1>
-          <p className="text-sm text-surface-400 mt-1">Get started with IndusBrain AI</p>
+          <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">Create account</h1>
+          <p className="text-sm text-surface-400 dark:text-surface-500 mt-1">Get started with IndusBrain AI</p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-surface-200/60 shadow-sm p-8">
+        <div className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200/60 shadow-sm p-8">
           <AnimatePresence>
             {error && (
               <motion.div
@@ -80,9 +80,9 @@ export default function Register() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1.5">Full Name</label>
+              <label className="block text-sm font-medium text-surface-700 dark:text-surface-200 mb-1.5">Full Name</label>
               <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400 dark:text-surface-500" />
                 <input
                   type="text"
                   value={fullName}
@@ -95,9 +95,9 @@ export default function Register() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1.5">Email</label>
+              <label className="block text-sm font-medium text-surface-700 dark:text-surface-200 mb-1.5">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400 dark:text-surface-500" />
                 <input
                   type="email"
                   value={email}
@@ -110,9 +110,9 @@ export default function Register() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-surface-700 mb-1.5">Password</label>
+              <label className="block text-sm font-medium text-surface-700 dark:text-surface-200 mb-1.5">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400 dark:text-surface-500" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -125,7 +125,7 @@ export default function Register() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-surface-400 dark:text-surface-500 hover:text-surface-600"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -145,7 +145,7 @@ export default function Register() {
           </form>
         </div>
 
-        <p className="text-center mt-6 text-sm text-surface-400">
+        <p className="text-center mt-6 text-sm text-surface-400 dark:text-surface-500">
           Already have an account?{' '}
           <Link to="/login" className="text-brand-600 hover:text-brand-700 font-medium hover:underline">
             Sign in

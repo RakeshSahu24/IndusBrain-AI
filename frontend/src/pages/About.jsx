@@ -17,8 +17,8 @@ export default function About() {
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-violet-500 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand-500/20">
           <Brain className="w-8 h-8 text-white" />
         </div>
-        <h1 className="text-3xl font-bold text-surface-900 mb-3">About IndusBrain AI</h1>
-        <p className="text-surface-400 leading-relaxed max-w-xl mx-auto">
+        <h1 className="text-3xl font-bold text-surface-900 dark:text-surface-100 mb-3">About IndusBrain AI</h1>
+        <p className="text-surface-400 dark:text-surface-500 leading-relaxed max-w-xl mx-auto">
           A full-stack intelligent document platform powered by FastAPI and React.
           Upload, analyze, and ask questions about your documents using cutting-edge AI.
         </p>
@@ -33,11 +33,11 @@ export default function About() {
             transition={{ delay: i * 0.1 }}
             className="card p-6"
           >
-            <div className="w-11 h-11 rounded-xl bg-surface-100 flex items-center justify-center mx-auto mb-4">
+            <div className="w-11 h-11 rounded-xl bg-surface-100 dark:bg-surface-700/50 flex items-center justify-center mx-auto mb-4">
               <item.icon className="w-5 h-5 text-brand-600" />
             </div>
-            <h3 className="text-sm font-semibold text-surface-900 mb-1.5">{item.title}</h3>
-            <p className="text-xs text-surface-400 leading-relaxed">{item.description}</p>
+            <h3 className="text-sm font-semibold text-surface-900 dark:text-surface-100 mb-1.5">{item.title}</h3>
+            <p className="text-xs text-surface-400 dark:text-surface-500 leading-relaxed">{item.description}</p>
           </motion.div>
         ))}
       </div>
@@ -48,7 +48,7 @@ export default function About() {
         transition={{ delay: 0.4 }}
         className="card p-8 inline-block mx-auto"
       >
-        <p className="text-sm text-surface-500">
+        <p className="text-sm text-surface-500 dark:text-surface-400">
           Built with <span className="text-brand-600 font-medium">React</span>,{' '}
           <span className="text-brand-600 font-medium">FastAPI</span>,{' '}
           <span className="text-brand-600 font-medium">ChromaDB</span>, and{' '}

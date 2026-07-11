@@ -10,6 +10,7 @@ import DocumentViewer from './pages/DocumentViewer'
 import AdminDashboard from './pages/AdminDashboard'
 import About from './pages/About'
 import KnowledgeGraph from './pages/KnowledgeGraph'
+import ComplianceChecker from './pages/ComplianceChecker'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 
@@ -99,6 +100,14 @@ export default function App() {
         element={
           <ProtectedLayout>
             <KnowledgeGraph />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/compliance-checker"
+        element={
+          <ProtectedLayout>
+            <ComplianceChecker />
           </ProtectedLayout>
         }
       />

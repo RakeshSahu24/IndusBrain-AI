@@ -17,7 +17,7 @@ export default function ProtectedRoute({ children, adminOnly = false }) {
           >
             <Loader2 className="w-8 h-8 text-brand-500" />
           </motion.div>
-          <p className="text-sm text-surface-400">Checking authentication...</p>
+          <p className="text-sm text-surface-400 dark:text-surface-500">Checking authentication...</p>
         </div>
       </div>
     )

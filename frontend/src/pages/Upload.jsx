@@ -167,8 +167,8 @@ export default function Upload() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-2xl font-bold text-surface-900">Upload Documents</h1>
-        <p className="text-sm text-surface-400 mt-1">Drag and drop or click to browse your files.</p>
+        <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">Upload Documents</h1>
+        <p className="text-sm text-surface-400 dark:text-surface-500 mt-1">Drag and drop or click to browse your files.</p>
       </motion.div>
 
       {/* Drop zone */}
@@ -184,8 +184,8 @@ export default function Upload() {
           onClick={() => inputRef.current?.click()}
           className={`relative overflow-hidden rounded-2xl border-2 border-dashed p-12 text-center cursor-pointer transition-all duration-300 ${
             dragging
-              ? 'border-brand-500 bg-brand-50/50 scale-[1.01]'
-              : 'border-surface-300 bg-white hover:border-brand-400 hover:bg-surface-50/50'
+              ? 'border-brand-500 dark:border-brand-400 bg-brand-50/50 dark:bg-brand-900/20 scale-[1.01]'
+              : 'border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 hover:border-brand-400 dark:hover:border-brand-500 hover:bg-surface-50/50 dark:hover:bg-surface-700/50'
           }`}
         >
           <input
@@ -206,10 +206,10 @@ export default function Upload() {
                 exit={{ scale: 0.8, opacity: 0 }}
                 className="space-y-3"
               >
-                <div className="w-16 h-16 rounded-2xl bg-brand-100 flex items-center justify-center mx-auto">
-                  <UploadIcon className="w-8 h-8 text-brand-600" />
+                <div className="w-16 h-16 rounded-2xl bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center mx-auto">
+                  <UploadIcon className="w-8 h-8 text-brand-600 dark:text-brand-400" />
                 </div>
-                <p className="text-lg font-semibold text-brand-600">Drop files here</p>
+                <p className="text-lg font-semibold text-brand-600 dark:text-brand-400">Drop files here</p>
               </motion.div>
             ) : (
               <motion.div
@@ -219,13 +219,13 @@ export default function Upload() {
                 exit={{ scale: 0.8, opacity: 0 }}
                 className="space-y-3"
               >
-                <div className="w-16 h-16 rounded-2xl bg-surface-100 flex items-center justify-center mx-auto group-hover:bg-brand-50 transition-colors">
-                  <UploadIcon className="w-8 h-8 text-surface-400" strokeWidth={1.5} />
+                <div className="w-16 h-16 rounded-2xl bg-surface-100 dark:bg-surface-700/50 flex items-center justify-center mx-auto group-hover:bg-brand-50 dark:group-hover:bg-brand-900/30 transition-colors">
+                  <UploadIcon className="w-8 h-8 text-surface-400 dark:text-surface-500" strokeWidth={1.5} />
                 </div>
-                <p className="text-base font-medium text-surface-700">
-                  Drag & drop files here, or <span className="text-brand-600">browse</span>
+                <p className="text-base font-medium text-surface-700 dark:text-surface-200">
+                  Drag & drop files here, or <span className="text-brand-600 dark:text-brand-400">browse</span>
                 </p>
-                <p className="text-sm text-surface-400">
+                <p className="text-sm text-surface-400 dark:text-surface-500">
                   PDF &middot; DOCX &middot; Excel &middot; Images
                 </p>
               </motion.div>
@@ -241,7 +241,7 @@ export default function Upload() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-600 font-medium"
+            className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-800/30 text-sm text-red-600 dark:text-red-400 font-medium"
           >
             <AlertCircle className="w-4 h-4" />
             {error}
@@ -258,7 +258,7 @@ export default function Upload() {
             exit={{ opacity: 0 }}
             className="card p-5"
           >
-            <h3 className="text-sm font-semibold text-surface-500 uppercase tracking-wider mb-3">Upload Queue</h3>
+            <h3 className="text-sm font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider mb-3">Upload Queue</h3>
             <div className="space-y-3">
               {fileQueue.map((f) => (
                 <motion.div
@@ -269,22 +269,22 @@ export default function Upload() {
                   className="flex items-center gap-3"
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    f.status === 'done' ? 'bg-emerald-100' :
-                    f.status === 'error' ? 'bg-red-100' : 'bg-brand-100'
+                    f.status === 'done' ? 'bg-emerald-100 dark:bg-emerald-900/40' :
+                    f.status === 'error' ? 'bg-red-100 dark:bg-red-900/40' : 'bg-brand-100 dark:bg-brand-900/40'
                   }`}>
                     {f.status === 'done' ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     ) : f.status === 'error' ? (
-                      <AlertCircle className="w-4 h-4 text-red-600" />
+                      <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
                     ) : uploading ? (
-                      <Loader2 className="w-4 h-4 text-brand-600 animate-spin" />
+                      <Loader2 className="w-4 h-4 text-brand-600 dark:text-brand-400 animate-spin" />
                     ) : (
-                      <FileText className="w-4 h-4 text-surface-400" />
+                      <FileText className="w-4 h-4 text-surface-400 dark:text-surface-500" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-surface-700 truncate">{f.name}</p>
-                    <div className="w-full h-1.5 bg-surface-100 rounded-full mt-1 overflow-hidden">
+                    <p className="text-sm font-medium text-surface-700 dark:text-surface-200 truncate">{f.name}</p>
+                    <div className="w-full h-1.5 bg-surface-100 dark:bg-surface-700/50 rounded-full mt-1 overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${f.progress || (f.status === 'done' ? 100 : f.status === 'error' ? 100 : 0)}%` }}
@@ -296,8 +296,8 @@ export default function Upload() {
                     </div>
                   </div>
                   <span className={`text-xs font-medium flex-shrink-0 ${
-                    f.status === 'done' ? 'text-emerald-600' :
-                    f.status === 'error' ? 'text-red-600' : 'text-brand-600'
+                    f.status === 'done' ? 'text-emerald-600 dark:text-emerald-400' :
+                    f.status === 'error' ? 'text-red-600 dark:text-red-400' : 'text-brand-600 dark:text-brand-400'
                   }`}>
                     {f.status === 'done' ? 'Done' : f.status === 'error' ? 'Failed' : `${f.progress}%`}
                   </span>
@@ -316,7 +316,7 @@ export default function Upload() {
         className="card overflow-hidden"
       >
         <div className="p-5 pb-0">
-          <h2 className="text-base font-semibold text-surface-900">Your Documents</h2>
+          <h2 className="text-base font-semibold text-surface-900 dark:text-surface-100">Your Documents</h2>
         </div>
 
         {docs.length === 0 ? (
@@ -331,15 +331,15 @@ export default function Upload() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-surface-100">
-                  <th className="text-left text-xs font-semibold text-surface-400 uppercase tracking-wider px-5 py-4">Name</th>
-                  <th className="text-left text-xs font-semibold text-surface-400 uppercase tracking-wider px-5 py-4 hidden sm:table-cell">Size</th>
-                  <th className="text-left text-xs font-semibold text-surface-400 uppercase tracking-wider px-5 py-4 hidden md:table-cell">Type</th>
-                  <th className="text-left text-xs font-semibold text-surface-400 uppercase tracking-wider px-5 py-4 hidden lg:table-cell">Uploaded</th>
+                <tr className="border-b border-surface-100 dark:border-surface-700/50">
+                  <th className="text-left text-xs font-semibold text-surface-400 dark:text-surface-500 uppercase tracking-wider px-5 py-4">Name</th>
+                  <th className="text-left text-xs font-semibold text-surface-400 dark:text-surface-500 uppercase tracking-wider px-5 py-4 hidden sm:table-cell">Size</th>
+                  <th className="text-left text-xs font-semibold text-surface-400 dark:text-surface-500 uppercase tracking-wider px-5 py-4 hidden md:table-cell">Type</th>
+                  <th className="text-left text-xs font-semibold text-surface-400 dark:text-surface-500 uppercase tracking-wider px-5 py-4 hidden lg:table-cell">Uploaded</th>
                   <th className="text-right px-5 py-4" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-surface-50">
+              <tbody className="divide-y divide-surface-50 dark:divide-surface-800/50">
                 {docs.map((doc, i) => {
                   const Icon = getFileIcon(doc.mime_type)
                   const label = getMimeLabel(doc.mime_type)
@@ -349,26 +349,26 @@ export default function Upload() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.03 }}
-                      className="hover:bg-surface-50 transition-colors group"
+                      className="hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors group"
                     >
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-9 h-9 rounded-lg bg-surface-100 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-50 transition-colors">
-                            <Icon className="w-4 h-4 text-surface-400 group-hover:text-brand-500 transition-colors" />
+                          <div className="w-9 h-9 rounded-lg bg-surface-100 dark:bg-surface-700/50 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-50 dark:group-hover:bg-brand-900/30 transition-colors">
+                            <Icon className="w-4 h-4 text-surface-400 dark:text-surface-500 group-hover:text-brand-500 dark:group-hover:text-brand-400 transition-colors" />
                           </div>
                           <div className="min-w-0">
-                            <p className="font-medium text-surface-900 truncate max-w-[180px] lg:max-w-xs">
+                            <p className="font-medium text-surface-900 dark:text-surface-100 truncate max-w-[180px] lg:max-w-xs">
                               {doc.original_filename}
                             </p>
-                            <span className="sm:hidden text-xs text-surface-400">{formatSize(doc.file_size)}</span>
+                            <span className="sm:hidden text-xs text-surface-400 dark:text-surface-500">{formatSize(doc.file_size)}</span>
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 py-4 text-surface-500 hidden sm:table-cell">{formatSize(doc.file_size)}</td>
+                      <td className="px-5 py-4 text-surface-500 dark:text-surface-400 hidden sm:table-cell">{formatSize(doc.file_size)}</td>
                       <td className="px-5 py-4 hidden md:table-cell">
                         <span className={`${badgeColor[label] || 'badge-info'}`}>{label}</span>
                       </td>
-                      <td className="px-5 py-4 text-surface-500 text-xs hidden lg:table-cell">{formatDate(doc.uploaded_at)}</td>
+                      <td className="px-5 py-4 text-surface-500 dark:text-surface-400 text-xs hidden lg:table-cell">{formatDate(doc.uploaded_at)}</td>
                       <td className="px-5 py-4 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <Link
@@ -387,7 +387,7 @@ export default function Upload() {
                           </button>
                           <button
                             onClick={() => deleteDoc(doc.id)}
-                            className="btn-ghost p-2 text-red-400 hover:text-red-600 hover:bg-red-50"
+                            className="btn-ghost p-2 text-red-400 dark:text-red-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />

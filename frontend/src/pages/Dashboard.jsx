@@ -97,10 +97,10 @@ export default function Dashboard() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-2xl font-bold text-surface-900">
+          <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">
             Welcome back, <span className="text-brand-600">{user.full_name}</span>
           </h1>
-          <p className="text-sm text-surface-400 mt-1">Here&apos;s what&apos;s happening today.</p>
+          <p className="text-sm text-surface-400 dark:text-surface-500 mt-1">Here&apos;s what&apos;s happening today.</p>
         </div>
         <Link to="/upload" className="btn-primary hidden sm:flex">
           <Upload className="w-4 h-4" />
@@ -123,13 +123,13 @@ export default function Dashboard() {
         className="card p-5"
       >
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2 text-sm text-surface-600">
-            <HardDrive className="w-4 h-4 text-surface-400" />
+          <div className="flex items-center gap-2 text-sm text-surface-600 dark:text-surface-300">
+            <HardDrive className="w-4 h-4 text-surface-400 dark:text-surface-500" />
             <span className="font-medium">Storage Usage</span>
           </div>
-          <span className="text-sm font-medium text-surface-500">{totalMB} MB / {storageLimitMB} MB</span>
+          <span className="text-sm font-medium text-surface-500 dark:text-surface-400">{totalMB} MB / {storageLimitMB} MB</span>
         </div>
-        <div className="w-full h-2.5 bg-surface-100 rounded-full overflow-hidden">
+        <div className="w-full h-2.5 bg-surface-100 dark:bg-surface-700/50 rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${storagePct}%` }}
@@ -152,11 +152,11 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-surface-400" />
-              <h2 className="text-base font-semibold text-surface-900">Recent Uploads</h2>
+              <Clock className="w-4 h-4 text-surface-400 dark:text-surface-500" />
+              <h2 className="text-base font-semibold text-surface-900 dark:text-surface-100">Recent Uploads</h2>
             </div>
             {docs.length > 0 && (
-              <span className="text-xs text-surface-400">{docs.length} total</span>
+              <span className="text-xs text-surface-400 dark:text-surface-500">{docs.length} total</span>
             )}
           </div>
 
@@ -182,14 +182,14 @@ export default function Dashboard() {
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-50 transition-colors group"
+                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors group"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-surface-100 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-50 transition-colors">
-                      <FileText className="w-4 h-4 text-surface-400 group-hover:text-brand-500 transition-colors" />
+                    <div className="w-9 h-9 rounded-lg bg-surface-100 dark:bg-surface-700/50 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-50 dark:group-hover:bg-brand-900/30 transition-colors">
+                      <FileText className="w-4 h-4 text-surface-400 dark:text-surface-500 group-hover:text-brand-500 transition-colors" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-surface-900 truncate">{doc.original_filename}</p>
-                      <p className="text-xs text-surface-400">{formatSize(doc.file_size)} &middot; {formatDate(doc.uploaded_at)}</p>
+                      <p className="text-sm font-medium text-surface-900 dark:text-surface-100 truncate">{doc.original_filename}</p>
+                      <p className="text-xs text-surface-400 dark:text-surface-500">{formatSize(doc.file_size)} &middot; {formatDate(doc.uploaded_at)}</p>
                     </div>
                     <span className={`${mimeBadge[label] || 'badge-info'} flex-shrink-0`}>{label}</span>
                     <Link
@@ -215,16 +215,16 @@ export default function Dashboard() {
         >
           <div className="flex items-center gap-2 mb-5">
             <Sparkles className="w-4 h-4 text-brand-500" />
-            <h2 className="text-base font-semibold text-surface-900">Quick Overview</h2>
+            <h2 className="text-base font-semibold text-surface-900 dark:text-surface-100">Quick Overview</h2>
           </div>
 
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between text-sm mb-1.5">
-                <span className="text-surface-400">Storage</span>
-                <span className="font-medium text-surface-700">{totalMB} / {storageLimitMB} MB</span>
+                <span className="text-surface-400 dark:text-surface-500">Storage</span>
+                <span className="font-medium text-surface-700 dark:text-surface-200">{totalMB} / {storageLimitMB} MB</span>
               </div>
-              <div className="w-full h-2 bg-surface-100 rounded-full overflow-hidden">
+              <div className="w-full h-2 bg-surface-100 dark:bg-surface-700/50 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
                     storagePct > 90 ? 'bg-red-500' : storagePct > 70 ? 'bg-amber-500' : 'bg-brand-500'
@@ -234,23 +234,23 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="divide-y divide-surface-100">
+            <div className="divide-y divide-surface-100 dark:divide-surface-700/50">
               {[
                 { label: 'Documents', value: docs.length },
                 { label: 'Team Members', value: '12' },
                 { label: 'Storage Limit', value: `${storageLimitMB} MB` },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between py-2.5 text-sm">
-                  <span className="text-surface-400">{item.label}</span>
-                  <span className="font-medium text-surface-700">{item.value}</span>
+                  <span className="text-surface-400 dark:text-surface-500">{item.label}</span>
+                  <span className="font-medium text-surface-700 dark:text-surface-200">{item.value}</span>
                 </div>
               ))}
             </div>
 
-            <div className="pt-2 border-t border-surface-100">
-              <p className="text-xs text-surface-400 mb-1">Account</p>
-              <p className="text-sm font-medium text-surface-900 capitalize">{user.role}</p>
-              <p className="text-xs text-surface-400 truncate">{user.email}</p>
+            <div className="pt-2 border-t border-surface-100 dark:border-surface-700/50">
+              <p className="text-xs text-surface-400 dark:text-surface-500 mb-1">Account</p>
+              <p className="text-sm font-medium text-surface-900 dark:text-surface-100 capitalize">{user.role}</p>
+              <p className="text-xs text-surface-400 dark:text-surface-500 truncate">{user.email}</p>
             </div>
 
             <Link
