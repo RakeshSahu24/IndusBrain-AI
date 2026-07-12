@@ -11,6 +11,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import About from './pages/About'
 import KnowledgeGraph from './pages/KnowledgeGraph'
 import ComplianceChecker from './pages/ComplianceChecker'
+import Search from './pages/Search'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 
@@ -108,6 +109,14 @@ export default function App() {
         element={
           <ProtectedLayout>
             <ComplianceChecker />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/search"
+        element={
+          <ProtectedLayout>
+            <Search />
           </ProtectedLayout>
         }
       />

@@ -16,12 +16,14 @@ import {
   Sun,
   Moon,
   ClipboardCheck,
+  Search,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/search', label: 'Search', icon: Search },
   { to: '/upload', label: 'Upload', icon: Upload },
   { to: '/chat', label: 'AI Chat', icon: MessageSquareText },
   { to: '/knowledge-graph', label: 'Knowledge Graph', icon: Share2 },
