@@ -38,9 +38,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="IndusBrain AI", version="1.0.0", lifespan=lifespan)
 
+origins_str = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=[o.strip() for o in origins_str.split(",") if o.strip()],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
