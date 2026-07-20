@@ -22,7 +22,7 @@ export default function Register() {
     try {
       await register(email, password, fullName)
       setSuccess(true)
-      setTimeout(() => navigate('/login'), 2000)
+      setTimeout(() => navigate('/dashboard'), 2000)
     } catch (err) {
       setError(err.response?.data?.detail || 'Registration failed')
     } finally {
@@ -42,7 +42,7 @@ export default function Register() {
             <CheckCircle2 className="w-8 h-8 text-emerald-600" />
           </div>
           <h2 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">Registration Successful!</h2>
-          <p className="text-surface-400 dark:text-surface-500">Redirecting to login...</p>
+          <p className="text-surface-400 dark:text-surface-500">Redirecting to dashboard...</p>
         </motion.div>
       </div>
     )
